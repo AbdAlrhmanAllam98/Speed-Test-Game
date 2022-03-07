@@ -79,8 +79,8 @@ function clickStartButton(){
         startButton.style.display='none';
         input.focus();
         if(startButton.innerHTML=="Play Again"){
-            finish.style.display="none";
-            timeLeft.innerHTML =levels[selectLevel.value];
+            getScoresFromLocalStorage();
+            playAgain();
         }
         startGame();   
     };
@@ -133,8 +133,9 @@ function checkTheInput(){
             finish.classList.remove("bad");
             finish.classList.add("good");
             finish.style.display="block";
+            theWord.innerHTML="";
             addScoresToLocalStorage();
-            playAgain();
+            showPlayAgain();
         }
     }
     else{
@@ -142,18 +143,22 @@ function checkTheInput(){
         finish.classList.add("bad");
         finish.style.display="block";
         upcomingWords.style.display='none';
+        input.value='';
+        theWord.innerHTML="";
         addScoresToLocalStorage();
-        playAgain();
+        showPlayAgain();
     }
 }
 function playAgain(){
     userScore.innerHTML=0;
-    startButton.innerHTML="Play Again"
-    startButton.style.display='block';
-    input.value='';
-    theWord.innerHTML="";
+    finish.style.display="none";
+    timeLeft.innerHTML =levels[selectLevel.value];
     arrayForEveryLevel();
     clickStartButton();
+}
+function showPlayAgain(){
+    startButton.innerHTML="Play Again"
+    startButton.style.display='block';
 }
 function addScoresToLocalStorage(){
     let lastScore=`${userScore.innerHTML} / ${totalScore.innerHTML}`;
