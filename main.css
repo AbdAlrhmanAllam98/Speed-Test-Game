@@ -149,6 +149,16 @@ body{
     color: var(--second-color);
     font-weight: bold;
 }
+.game .container .the-last{
+    display:flex;
+    justify-content: space-around;
+    margin: 20px auto;
+    padding: var(--padding-standard);
+}
+.game .container .the-last span{
+    color: var(--second-color);
+    font-weight: bold;
+}
 .game .container .finish{
     margin: 20px 0;
     padding: var(--padding-standard);

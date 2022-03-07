@@ -1,4 +1,4 @@
-let easyWords=["Hello","Code","Town","Task","Runner","Roles","Test","Rust","Scala","Funny"];
+let easyWords=["Hello","Code","Town","Task","Scala","Funny","Roles","Rust"];
 let normalWords=easyWords.concat(["Country","Testing","Youtube","Linkedin","Twitter","Github","Leetcode","Internet","Python","Cascade","Coding","Working","Playing"]);
 let hardWords=normalWords.concat(["Programming","Javascript","Destructuring","Paradigm","Styling","Documentation","Dependencies"]);
 let words=[];
@@ -19,26 +19,21 @@ let userScore=document.querySelector(".control .score .got");
 let totalScore=document.querySelector(".control .score .total");
 let finish=document.querySelector(".finish");
 let gameInstrcution=document.querySelector(".game .game-instruction p");
+let theLastScore=document.querySelector(".the-last .last-score span");
+let theHighScore=document.querySelector(".the-last .high-score span");
 let word='';
 let firstTime=true;
+let highScore;
+let lastScore;
+
 
 fillGameInstruction();
-initalizeDefaultValues()
-selectLevel.addEventListener("click",function(){
-    theLevel.innerHTML=selectLevel.value;
-    totalSeconds.innerHTML=levels[selectLevel.value];
-    timeLeft.innerHTML =levels[selectLevel.value];
-    arrayForEveryLevel();
-    totalScore.innerHTML = words.length;
-});
-
+getScoresFromLocalStorage();
+initalizeDefaultValues();
+selectTheLevel();
+clickStartButton();
 input.onpaste=function(){
     return false;
-};
-startButton.onclick=function(){
-    startButton.remove();
-    input.focus();
-    startGame();
 };
 
 function fillGameInstruction(){
@@ -54,33 +49,57 @@ function initalizeDefaultValues(){
     theLevel.innerHTML="Normal";
     totalSeconds.innerHTML=levels["Normal"];
     timeLeft.innerHTML = totalSeconds.innerHTML;
-    words=normalWords;
+    words.push(...normalWords);
     totalScore.innerHTML = words.length;
+    userScore.innerHTML=0;
+}
+function selectTheLevel(){
+    selectLevel.addEventListener("click",function(){
+        theLevel.innerHTML=selectLevel.value;
+        totalSeconds.innerHTML=levels[selectLevel.value];
+        timeLeft.innerHTML =levels[selectLevel.value];
+        arrayForEveryLevel();
+        totalScore.innerHTML = words.length;
+    });
 }
 function arrayForEveryLevel(){
+    words=[];
     if(selectLevel.value=="Easy"){
-        words=easyWords;
+        words.push(...easyWords);
     }
     else if(selectLevel.value=="Normal"){
-        words=normalWords;
+        words.push(...normalWords);
     }
     else if(selectLevel.value=="Hard"){
-        words=hardWords;
+        words.push(...hardWords);
     }
 }
+function clickStartButton(){
+    startButton.onclick=function(){
+        startButton.style.display='none';
+        input.focus();
+        if(startButton.innerHTML=="Play Again"){
+            finish.style.display="none";
+            timeLeft.innerHTML =levels[selectLevel.value];
+        }
+        startGame();   
+    };
+}
+
 function startGame(){
     generateWord()
     generateUpComingWords();
     startTimeCount();
 }
 function generateWord(){
-    word=words[Math.floor(Math.random()*words.length)];
+    let wordIndex=Math.floor(Math.random()*words.length);
+    word=words[wordIndex];
     theWord.innerHTML=word;
-    let wordIndex=words.indexOf(word);
     words.splice(wordIndex,1);
 }
 function generateUpComingWords(){
     upcomingWords.innerHTML='';
+    upcomingWords.style.display='flex';
     for(let i=0;i<words.length;i++){
         let div=document.createElement("div");
         let text=document.createTextNode(words[i]);
@@ -110,12 +129,53 @@ function checkTheInput(){
             startGame();
         }
         else{
-            finish.innerHTML="Excellent"
+            finish.innerHTML="Excellent";
+            finish.classList.remove("bad");
             finish.classList.add("good");
+            finish.style.display="block";
+            addScoresToLocalStorage();
+            playAgain();
         }
     }
     else{
-        finish.innerHTML="Game Over"
+        finish.innerHTML="Game Over";
         finish.classList.add("bad");
+        finish.style.display="block";
+        upcomingWords.style.display='none';
+        addScoresToLocalStorage();
+        playAgain();
     }
+}
+function playAgain(){
+    userScore.innerHTML=0;
+    startButton.innerHTML="Play Again"
+    startButton.style.display='block';
+    input.value='';
+    theWord.innerHTML="";
+    arrayForEveryLevel();
+    clickStartButton();
+}
+function addScoresToLocalStorage(){
+    let lastScore=`${userScore.innerHTML} / ${totalScore.innerHTML}`;
+    if(highScore<userScore.innerHTML){
+        highScore=userScore.innerHTML;
+    }
+    localStorage.setItem("last-score",lastScore);
+    localStorage.setItem("high-score",highScore);
+}
+function getScoresFromLocalStorage(){
+    if(localStorage.getItem("high-score")){
+        highScore=localStorage.getItem("high-score");
+    }
+    else{
+        highScore=0;
+    }
+    if(localStorage.getItem("last-score")){
+        lastScore=localStorage.getItem("last-score");
+    }
+    else{
+        lastScore="0";
+    }
+    theHighScore.innerHTML=highScore;
+    theLastScore.innerHTML=lastScore;
 }
